@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Formulario de Contacto</title>
+  <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+  <div class="form-container">
+    <h2>Contáctanos</h2>
+    <form id="contactoForm">
+      <label for="nombre">Nombre</label>
+      <input type="text" id="nombre" name="nombre" required>
+
+      <label for="correo">Correo</label>
+      <input type="email" id="correo" name="correo" required>
+
+      <label for="mensaje">Mensaje</label>
+      <textarea id="mensaje" name="mensaje" rows="5" required></textarea>
+
+      <input type="submit" value="Enviar">
+    </form>
+    <div id="respuesta" class="mensaje"></div>
+  </div>
+
+  <script>
+    const form = document.getElementById('contactoForm');
+    const respuesta = document.getElementById('respuesta');
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const nombre = document.getElementById('nombre').value.trim();
+      const correo = document.getElementById('correo').value.trim();
+      const mensaje = document.getElementById('mensaje').value.trim();
+
+      if (!nombre || !correo || !mensaje) {
+        mostrarMensaje('Por favor, completa todos los campos.', 'error');
+        return;
+      }
+
+      const formData = new FormData(form);
+
+      fetch('guardar.php', {
+        method: 'POST',
+        body: formData
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          mostrarMensaje('Mensaje enviado con éxito. ¡Gracias!', 'success');
+          form.reset();
+        } else {
+          mostrarMensaje('Error al enviar el mensaje. Intenta más tarde.', 'error');
+        }
+      })
+      .catch(() => {
+        mostrarMensaje('Error en la conexión. Intenta de nuevo.', 'error');
+      });
+    });
+
+    function mostrarMensaje(texto, tipo) {
+      respuesta.textContent = texto;
+      respuesta.className = 'mensaje ' + tipo;
+      respuesta.style.display = 'block';
+      setTimeout(() => {
+        respuesta.style.display = 'none';
+      }, 4000);
+    }
+  </script>
+</body>
+</html>
